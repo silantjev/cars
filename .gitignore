@@ -1,0 +1,4 @@
+.ipynb_checkpoints/
+df_prep.csv
+__pycache__/
+*.pickle
