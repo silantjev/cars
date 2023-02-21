@@ -5,8 +5,12 @@ import pandas as pd
 from fastapi import FastAPI
 from pydantic import BaseModel
 
+from flask import Flask
+from flask import request
+from flask import jsonify
 
-app = FastAPI()
+app = Flask(__name__)
+
 path_dir = os.path.dirname(__file__)
 path = os.path.join(path_dir, 'cars_dill_pipe.pkl')
 with open(path, 'rb') as file:
@@ -37,23 +41,25 @@ class Prediction(BaseModel):
     pred: str
     price: int
 
-@app.get('/status')
+@app.route('/status')
 def status():
-    return 'Active'
+    return {'status': 'Active'}
 
 
-@app.get('/version')
+@app.route('/version')
 def version():
     return model['metadata']
 
-@app.post('/predict', response_model=Prediction)
-def predict(form: Form):
-    df = pd.DataFrame.from_dict([form.dict()])
+@app.route('/predict', methods = ['POST'])
+def predict():
+    form = request.get_json()
+    df = pd.DataFrame.from_dict([form])
     pipe = model['pipe']
     y = pipe.predict(df)
     r = {}
-    r["id"] = df["id"][0]
-    r["price"] = df["price"][0]
+    r["id"] = int(df["id"][0])
+    r["price"] = int(df["price"][0])
     r["pred"] = y[0]
     return r
 
+app.run(host='0.0.0.0', port=8000)
