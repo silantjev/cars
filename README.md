@@ -44,7 +44,7 @@ docker build -t cars .
 -Запуск:
 docker run --rm --name api -d -p 8000:8000 cars
 
--Остоновка:
+-Остановка:
 docker stop api
 
 
